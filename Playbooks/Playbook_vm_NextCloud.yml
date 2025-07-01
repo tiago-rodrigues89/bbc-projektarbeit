@@ -1,0 +1,94 @@
+---
+- name: Nextcloud auf Debian 12 installieren (Datenbank extern)
+  hosts: group_nextcloud
+  become: true
+
+  vars:
+    db_name: projekt_db
+    db_user: projektuser
+    db_password: "1234"
+    db_host: 192.168.1.43   # IP der Datenbank-VM anpassen
+    web_root: /var/www/html
+    nextcloud_url: https://download.nextcloud.com/server/releases/latest.zip
+
+  tasks:
+    - name: Abhängigkeiten installieren
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+          - php
+          - php-gd
+          - php-mysql
+          - php-curl
+          - php-mbstring
+          - php-intl
+          - php-imagick
+          - php-xml
+          - php-zip
+          - unzip
+        state: present
+        update_cache: yes
+
+    - name: Nextcloud herunterladen
+      get_url:
+        url: "{{ nextcloud_url }}"
+        dest: /tmp/nextcloud.zip
+
+    - name: Nextcloud entpacken
+      unarchive:
+        src: /tmp/nextcloud.zip
+        dest: "{{ web_root }}"
+        remote_src: yes
+
+    - name: Nextcloud-Verzeichnis Besitzrechte setzen
+      file:
+        path: "{{ web_root }}/nextcloud"
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Apache für Nextcloud konfigurieren
+      copy:
+        dest: /etc/apache2/sites-available/nextcloud.conf
+        content: |
+          <VirtualHost *:80>
+              DocumentRoot {{ web_root }}/nextcloud
+              <Directory {{ web_root }}/nextcloud/>
+                  Require all granted
+                  AllowOverride All
+                  Options FollowSymLinks MultiViews
+              </Directory>
+          </VirtualHost>
+
+    - name: Apache Module aktivieren
+      command: a2enmod rewrite
+      notify: Apache neu starten
+
+    - name: Nextcloud Site aktivieren
+      command: a2ensite nextcloud.conf
+      notify: Apache neu starten
+
+    - name: Apache neu starten
+      systemd:
+        name: apache2
+        state: restarted
+
+    - name: Nextcloud mit CLI installieren
+      command: >
+        sudo -u www-data php {{ web_root }}/nextcloud/occ maintenance:install
+        --database "mysql"
+        --database-name "{{ db_name }}"
+        --database-user "{{ db_user }}"
+        --database-pass "{{ db_password }}"
+        --database-host "{{ db_host }}"
+        --admin-user "admin"
+        --admin-pass "adminpassword"
+      args:
+        creates: "{{ web_root }}/nextcloud/config/config.php"
+
+  handlers:
+    - name: Apache neu starten
+      systemd:
+        name: apache2
+        state: restarted

@@ -1,0 +1,27 @@
+---
+- name: Apache Webserver auf Debian 12 installieren
+  hosts: group_webserver
+  become: yes
+  tasks:
+
+    - name: Paketliste aktualisieren
+      apt:
+        update_cache: yes
+
+    - name: Apache2 installieren
+      apt:
+        name: apache2
+        state: present
+
+    - name: Apache2-Dienst aktivieren und starten
+      systemd:
+        name: apache2
+        enabled: yes
+        state: started
+
+
+
+
+
+
+

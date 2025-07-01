@@ -1,0 +1,37 @@
+[localhost]
+127.0.0.1
+
+[proxmox]
+192.168.1.11
+[proxmox:vars]
+ansible_user=root
+ansible_password=Sunrise-123
+iso_storage_pool=mydata
+vm_storage_pool=mydata
+debian_iso_filename=debian-12.11.0-amd64-netinst.iso
+
+[all_vms]
+nextcloud ansible_host=192.168.1.44 ansible_user=ansible-user-187 ansible_password=Sunrise ansible_become_password=Sunrise
+mariadb   ansible_host=192.168.1.43 ansible_user=ansible-user-187 ansible_password=Sunrise ansible_become_password=Sunrise
+webserver ansible_host=192.168.1.45 ansible_user=ansible-user-187 ansible_password=Sunrise ansible_become_password=Sunrise
+
+[group_webserver]
+192.168.1.45
+[group_webserver:vars]
+ansible_user=ansible-user-187
+ansible_password=Sunrise
+ansible_become_password=Sunrise
+
+[group_mariadb]
+192.168.1.43
+[group_mariadb:vars]
+ansible_user=ansible-user-187
+ansible_password=Sunrise
+ansible_become_password=Sunrise
+
+[group_nextcloud]
+192.168.1.44
+[group_nextcloud:vars]
+ansible_user=ansible-user-187
+ansible_password=Sunrise
+ansible_become_password=Sunrise

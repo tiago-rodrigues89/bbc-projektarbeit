@@ -1,0 +1,53 @@
+---
+- name: VMs auf Proxmox erstellen
+  hosts: proxmox
+  vars:
+    node: pve
+    api_user: "root@pam"
+    api_token_id: "sunrise"
+    api_token_secret: "4a703932-5842-4f68-a4db-49e595595455"
+    iso_storage: "{{ iso_storage_pool }}"
+    vm_storage: "{{ vm_storage_pool }}"
+    iso_file: "{{ debian_iso_filename }}"
+
+    vms:
+      - name: "vm-nextcloud"
+        vmid: 111
+        cpu: 2
+        memory: 8192
+        disk_size: 100
+      - name: "vm-webserver"
+        vmid: 113
+        cpu: 2
+        memory: 2048
+        disk_size: 20
+      - name: "vm-mariadb"
+        vmid: 112
+        cpu: 2
+        memory: 4096
+        disk_size: 20
+
+  tasks:
+    - name: VM erstellen auf Proxmox
+      connection: local
+      community.general.proxmox_kvm:
+        api_user: "{{ api_user }}"
+        api_token_id: "{{ api_token_id }}"
+        api_token_secret: "{{ api_token_secret }}"
+        api_host: "{{ inventory_hostname }}"
+        node: "{{ node }}"
+        name: "{{ item.name }}"
+        vmid: "{{ item.vmid }}"
+        memory: "{{ item.memory }}"
+        cores: "{{ item.cpu }}"
+        scsi:
+          scsi0: "mydata:{{ item.disk_size }}"
+        ide:
+          ide2: "{{ iso_storage }}:iso/{{ iso_file }},media=cdrom"
+        net:
+          net0: "virtio,bridge=vmbr0"
+        ostype: l26
+        boot: "order=scsi0;ide2"
+        state: present
+      loop: "{{ vms }}"
+      delegate_to: localhost

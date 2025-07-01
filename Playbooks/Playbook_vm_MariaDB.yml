@@ -1,0 +1,57 @@
+---
+- name: MariaDB vollständig einrichten
+  hosts: group_mariadb
+  become: true
+
+  vars:
+    mariadb_root_password: "1234"
+    mariadb_db_name: "projekt_db"
+    mariadb_user: "projektuser"
+    mariadb_user_password: "1234"
+
+  tasks:
+    - name: Erforderliche Python-MySQL Bibliothek installieren
+      ansible.builtin.apt:
+        name: python3-pymysql
+        state: present
+        update_cache: true
+
+    - name: MariaDB installieren
+      ansible.builtin.apt:
+        name: mariadb-server
+        state: present
+        update_cache: true
+
+    - name: MariaDB-Dienst starten und aktivieren
+      ansible.builtin.service:
+        name: mariadb
+        state: started
+        enabled: true
+
+    - name: Root Passwort setzen (explizit, wenn bereits vorhanden)
+      community.mysql.mysql_user:
+        login_user: root
+        login_password: "{{ mariadb_root_password }}"
+        name: root
+        password: "{{ mariadb_root_password }}"
+        host_all: true
+        state: present
+
+    - name: Datenbank erstellen
+      community.mysql.mysql_db:
+        name: "{{ mariadb_db_name }}"
+        state: present
+        login_user: root
+        login_password: "{{ mariadb_root_password }}"
+
+    - name: Benutzer anlegen und Rechte vergeben
+      community.mysql.mysql_user:
+        name: "{{ mariadb_user }}"
+        password: "{{ mariadb_user_password }}"
+        priv: "{{ mariadb_db_name }}.*:ALL"
+        host: "%"
+        state: present
+        login_user: root
+        login_password: "{{ mariadb_root_password }}"
+
+

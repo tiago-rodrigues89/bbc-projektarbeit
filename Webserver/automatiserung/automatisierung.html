@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Automatisierung</title>
+<style>
+
+    body {
+
+      background: #0f172a;
+
+      color: #e2e8f0;
+
+      font-family: Arial, sans-serif;
+
+      padding: 2rem;
+
+    }
+
+    h1 {
+
+      color: #38bdf8;
+
+    }
+
+    p {
+
+      max-width: 800px;
+
+      line-height: 1.6;
+
+    }
+
+    a {
+
+      color: #38bdf8;
+
+      text-decoration: none;
+
+    }
+
+    a:hover {
+
+      text-decoration: underline;
+
+    }
+</style>
+</head>
+<body>
+<h1>Automatisierung</h1>
+<p>
+
+    Im Zentrum unseres Projekts stand die Verbindung von Ansible mit der Virtualisierungsplattform Proxmox.
+
+    Über ein API-Token konnten wir direkt auf den Proxmox-Host zugreifen und VMs automatisch erstellen.
+
+    Dabei nutzten wir das Ansible-Modul <code>community.general.proxmox_kvm</code>, um die Konfigurationen
+
+    der Maschinen als Code zu beschreiben. Jede virtuelle Maschine bekam eigene Parameter wie CPU, RAM,
+
+    Speicher und ISO-Image – vollständig automatisiert und reproduzierbar.
+</p>
+<p>
+
+    Auch das Netzwerk wurde via <code>vmbr0</code> angebunden und erhielt per DHCP vom Router die IP-Adressen.
+
+    Damit war die Basis für die weitere Konfiguration geschaffen.
+</p>
+<p><a href="/">Zurück zur Hauptseite</a></p>
+</body>
+</html>
