@@ -5,7 +5,7 @@
   vars:
     common_packages:
       - sudo
-      - vim
+      - nano
       - curl
       - htop
       - net-tools
