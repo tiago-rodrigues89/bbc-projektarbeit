@@ -53,5 +53,3 @@
         state: present
         login_user: root
         login_password: "{{ mariadb_root_password }}"
-
-
