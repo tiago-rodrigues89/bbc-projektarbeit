@@ -1,0 +1,27 @@
+
+---
+- name: Vorhandene VMs auf Proxmox starten
+  hosts: proxmox
+  vars:
+    node: pve
+    api_user: "root@pam"
+    api_token_id: "sunrise"
+    api_token_secret: "4a703932-5842-4f68-a4db-49e595595455"
+    vms:
+      - vmid: 111
+      - vmid: 112
+      - vmid: 113
+
+  tasks:
+    - name: VM starten
+      connection: local
+      community.general.proxmox_kvm:
+        api_host: "{{ inventory_hostname }}"
+        api_user: "{{ api_user }}"
+        api_token_id: "{{ api_token_id }}"
+        api_token_secret: "{{ api_token_secret }}"
+        node: "{{ node }}"
+        vmid: "{{ item.vmid }}"
+        state: started
+      loop: "{{ vms }}"
+      delegate_to: localhost
