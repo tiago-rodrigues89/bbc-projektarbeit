@@ -18,10 +18,3 @@
         name: apache2
         enabled: yes
         state: started
-
-
-
-
-
-
-
